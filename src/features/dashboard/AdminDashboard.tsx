@@ -4,13 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings, BarChart3, Users, Workflow } from 'lucide-react';
 import { FlowBuilder } from './FlowBuilder';
+import { Analytics } from './Analytics';
+import { ClientManagement } from './ClientManagement';
 
 export const AdminDashboard = () => {
   const { profile, signOut } = useAuth();
-  const [currentView, setCurrentView] = useState<'dashboard' | 'flow-builder'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'flow-builder' | 'analytics' | 'clients'>('dashboard');
 
   if (currentView === 'flow-builder') {
     return <FlowBuilder onBack={() => setCurrentView('dashboard')} />;
+  }
+
+  if (currentView === 'analytics') {
+    return <Analytics onBack={() => setCurrentView('dashboard')} />;
+  }
+
+  if (currentView === 'clients') {
+    return <ClientManagement onBack={() => setCurrentView('dashboard')} />;
   }
 
   return (
@@ -68,7 +78,7 @@ export const AdminDashboard = () => {
               </p>
               <Button 
                 className="w-full"
-                onClick={() => alert('Analytics feature coming soon!')}
+                onClick={() => setCurrentView('analytics')}
               >
                 View Analytics
               </Button>
@@ -91,7 +101,7 @@ export const AdminDashboard = () => {
               </p>
               <Button 
                 className="w-full"
-                onClick={() => alert('Client Management feature coming soon!')}
+                onClick={() => setCurrentView('clients')}
               >
                 Manage Clients
               </Button>
