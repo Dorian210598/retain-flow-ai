@@ -45,13 +45,19 @@ export const RealTimeMetrics: React.FC = () => {
         const sessionsToday = todaySessions?.length || 0;
         const activeCount = activeSessions?.length || 0;
         
-        const completedToday = todaySessions?.filter(s => s.end_time) || [];
+        const completedToday = todaySessions?.filter(s => {
+          if (!s.end_time) return false;
+          const duration = new Date(s.end_time).getTime() - new Date(s.start_time).getTime();
+          // Only include sessions shorter than 5 minutes (real user sessions)
+          return duration > 0 && duration < (5 * 60 * 1000);
+        }) || [];
+        
         const avgResponseTime = completedToday.length > 0 
           ? completedToday.reduce((acc, session) => {
               const start = new Date(session.start_time).getTime();
               const end = new Date(session.end_time!).getTime();
               return acc + (end - start);
-            }, 0) / completedToday.length / 1000 // in seconds, not minutes
+            }, 0) / completedToday.length / 1000 // in seconds
           : 0;
 
         const retainedToday = todaySessions?.filter(s => s.outcome === 'retained').length || 0;

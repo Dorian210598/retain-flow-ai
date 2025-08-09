@@ -105,8 +105,19 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       const completedSessions = sessions?.filter(s => {
         if (!s.end_time) return false;
         const duration = new Date(s.end_time).getTime() - new Date(s.start_time).getTime();
-        return duration > 0 && duration < (30 * 60 * 1000); // Exclude sessions longer than 30 minutes (likely mock data)
+        const durationMinutes = duration / (1000 * 60);
+        
+        // Debug: log sessions that might be mock data
+        if (durationMinutes > 5) {
+          console.log(`Filtering out long session: ${s.id}, duration: ${durationMinutes.toFixed(1)} minutes`);
+        }
+        
+        // Only include sessions shorter than 5 minutes (real user sessions)
+        return duration > 0 && duration < (5 * 60 * 1000);
       }) || [];
+      
+      console.log(`Total sessions: ${sessions?.length}, Completed sessions after filtering: ${completedSessions.length}`);
+      
       const totalTime = completedSessions.reduce((acc, session) => {
         const start = new Date(session.start_time).getTime();
         const end = new Date(session.end_time!).getTime();
