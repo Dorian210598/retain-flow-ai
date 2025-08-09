@@ -75,13 +75,7 @@ export const ClientDashboard = () => {
 
   const handleStartCancellation = () => {
     if (policy) {
-      showOwlMessage({
-        message: "Teraz rozpoczyna się właściwe badanie! Przejdziesz przez proces anulowania polisy. Każdy krok może zawierać różne strategie retencji - obserwuj je uważnie i reaguj naturalnie! 🔍",
-        position: 'center',
-        autoClose: true,
-        delay: 6000
-      });
-      setTimeout(() => setShowCancellation(true), 2000);
+      setShowCancellation(true);
     }
   };
 
@@ -93,17 +87,17 @@ export const ClientDashboard = () => {
     return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
   }
 
-  // Show welcome owl message
+  // Show welcome message only once
   useEffect(() => {
     if (!loading && policy) {
       const timer = setTimeout(() => {
         showOwlMessage({
-          message: "Świetnie! Jesteście teraz w panelu klienta. Zobaczycie tutaj symulowaną polisę ubezpieczeniową. Gdy będziecie gotowi, kliknijcie 'Start Cancellation Process', aby rozpocząć badanie! 📋",
-          position: 'bottom-left',
+          message: "To jest panel klienta z przykładową polisą. Kliknij 'Start Cancellation Process' aby rozpocząć badanie! 📋",
+          position: 'bottom-right',
           autoClose: true,
-          delay: 8000
+          delay: 5000
         });
-      }, 1000);
+      }, 2000);
 
       return () => clearTimeout(timer);
     }

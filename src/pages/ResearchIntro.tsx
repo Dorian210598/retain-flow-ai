@@ -53,24 +53,17 @@ const ResearchIntro = () => {
     }
   ];
 
-  // Show owl messages based on current slide
+  // Show only one welcome message
   useEffect(() => {
-    const owlMessages = [
-      "Cześć! Jestem Profesor Sowa i będę Waszym przewodnikiem w tym badaniu! 🦉 Kliknijcie na podkreślone słowa, żeby dowiedzieć się więcej!",
-      "Teraz opowiem Wam o celu tego badania. To fascynujące, jak różne strategie mogą wpłynąć na decyzje klientów!",
-      "Wasza rola jest bardzo ważna! Będziecie symulować prawdziwego klienta - reagujcie naturalnie na to, co zobaczycie.",
-      "Pamiętajcie - wszystko jest całkowicie bezpieczne! To tylko symulacja dla celów naukowych. Możecie spokojnie eksperymentować!"
-    ];
-
-    if (currentSlide < owlMessages.length) {
+    if (currentSlide === 0) {
       const timer = setTimeout(() => {
         showOwlMessage({
-          message: owlMessages[currentSlide],
-          position: currentSlide % 2 === 0 ? 'bottom-right' : 'bottom-left',
+          message: "Cześć! Jestem Waszym przewodnikiem w badaniu. Kliknijcie podkreślone słowa, by dowiedzieć się więcej! 🦉",
+          position: 'bottom-right',
           autoClose: true,
-          delay: 8000
+          delay: 6000
         });
-      }, 500);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -80,13 +73,7 @@ const ResearchIntro = () => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     } else {
-      showOwlMessage({
-        message: "Świetnie! Teraz przejdziemy do logowania. Pamiętajcie - większość z Was powinna wybrać rolę 'Client'. Powodzenia! 🎓",
-        position: 'center',
-        autoClose: true,
-        delay: 5000
-      });
-      setTimeout(() => navigate('/auth'), 1000);
+      navigate('/auth');
     }
   };
 

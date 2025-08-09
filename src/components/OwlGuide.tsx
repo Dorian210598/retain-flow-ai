@@ -82,30 +82,30 @@ export const OwlGuide: React.FC<OwlGuideProps> = ({
         </div>
       </div>
 
-      {/* Animated Owl */}
+      {/* Simple Owl */}
       <div className="flex justify-start pl-4">
-        <div className="relative animate-bounce">
+        <div className="relative">
           {/* Owl body */}
-          <div className="w-16 h-20 bg-gradient-to-b from-amber-100 to-amber-200 rounded-full relative">
+          <div className="w-12 h-16 bg-gray-100 border-2 border-gray-800 rounded-full relative">
             {/* Owl face */}
-            <div className="absolute inset-x-0 top-2 flex justify-center">
-              <div className="w-12 h-12 bg-white rounded-full border-2 border-amber-300 relative">
+            <div className="absolute inset-x-0 top-1 flex justify-center">
+              <div className="w-8 h-8 bg-white border border-gray-800 rounded-full relative">
                 {/* Eyes */}
-                <div className="absolute top-2 left-2 w-3 h-3 bg-black rounded-full"></div>
-                <div className="absolute top-2 right-2 w-3 h-3 bg-black rounded-full"></div>
+                <div className="absolute top-1 left-1 w-2 h-2 bg-black rounded-full"></div>
+                <div className="absolute top-1 right-1 w-2 h-2 bg-black rounded-full"></div>
                 
                 {/* Beak */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-3 border-transparent border-t-orange-400"></div>
+                <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-transparent border-t-gray-800"></div>
               </div>
             </div>
 
-            {/* Wings */}
-            <div className="absolute top-8 -left-1 w-4 h-8 bg-amber-200 rounded-full"></div>
-            <div className="absolute top-8 -right-1 w-4 h-8 bg-amber-200 rounded-full"></div>
+            {/* Simple wings */}
+            <div className="absolute top-6 -left-1 w-3 h-6 bg-gray-200 border border-gray-800 rounded-full"></div>
+            <div className="absolute top-6 -right-1 w-3 h-6 bg-gray-200 border border-gray-800 rounded-full"></div>
 
             {/* Feet */}
-            <div className="absolute -bottom-1 left-3 w-2 h-3 bg-orange-400 rounded-sm"></div>
-            <div className="absolute -bottom-1 right-3 w-2 h-3 bg-orange-400 rounded-sm"></div>
+            <div className="absolute -bottom-1 left-2 w-1 h-2 bg-gray-800"></div>
+            <div className="absolute -bottom-1 right-2 w-1 h-2 bg-gray-800"></div>
           </div>
         </div>
       </div>
