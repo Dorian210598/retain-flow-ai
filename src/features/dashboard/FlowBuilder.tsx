@@ -2,11 +2,12 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Settings, Play, Pause, ArrowLeft, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Settings, Play, Pause, ArrowLeft, Edit, Trash2, Eye, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -488,18 +489,27 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                   <p className="text-muted-foreground">{selectedFlow.name}</p>
                 </div>
               </div>
-              <div className="flex gap-2">
-                {componentTypes.map(comp => (
-                  <Button 
-                    key={comp.value}
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => addStep(comp.value)}
-                  >
-                    Add {comp.label}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Component
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
-                ))}
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  {componentTypes.map(comp => (
+                    <DropdownMenuItem 
+                      key={comp.value}
+                      onClick={() => addStep(comp.value)}
+                      className="flex flex-col items-start gap-1 p-3"
+                    >
+                      <div className="font-medium">{comp.label}</div>
+                      <div className="text-xs text-muted-foreground">{comp.description}</div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>
