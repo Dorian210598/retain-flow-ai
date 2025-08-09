@@ -85,7 +85,8 @@ export const useFlowRenderer = (policyId?: string) => {
         })
         .select()
         .single();
-
+      console.log('🔥 BEFORE SESSION CHECK - sessionError:', sessionError);
+      
       if (sessionError) {
         console.error('❌ Session error:', sessionError);
         throw sessionError;
@@ -94,13 +95,16 @@ export const useFlowRenderer = (policyId?: string) => {
       console.log('🔥 NEW CODE: Session created successfully:', session);
       console.log('📝 About to set sessionId to:', session.id);
       
-      // Force state update with callback to ensure it's set
-      setSessionId(prevId => {
-        console.log('🔄 SessionId changing from', prevId, 'to', session.id);
-        return session.id;
-      });
-      
-      console.log('📝 setSessionId called with:', session.id);
+      try {
+        // Force state update with callback to ensure it's set
+        setSessionId(prevId => {
+          console.log('🔄 SessionId changing from', prevId, 'to', session.id);
+          return session.id;
+        });
+        console.log('📝 setSessionId called successfully with:', session.id);
+      } catch (setError) {
+        console.error('❌ Error in setSessionId:', setError);
+      }
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
