@@ -92,7 +92,7 @@ export const useFlowRenderer = (policyId?: string) => {
         throw sessionError;
       }
       
-      console.log('🔥 FORCED UNIQUE LOG 12345: Session created successfully:', session);
+      console.log('🔥 MEGA UNIQUE LOG 999999: Session created successfully:', session);
       console.log('📝 About to set sessionId to:', session.id);
       
       try {
@@ -102,6 +102,12 @@ export const useFlowRenderer = (policyId?: string) => {
           return session.id;
         });
         console.log('📝 setSessionId called successfully with:', session.id);
+        
+        // Force a re-render by updating loading state
+        setTimeout(() => {
+          console.log('🔄 Forcing re-render after sessionId set');
+          setLoading(false);
+        }, 0);
       } catch (setError) {
         console.error('❌ Error in setSessionId:', setError);
       }
