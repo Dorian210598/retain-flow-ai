@@ -280,17 +280,68 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
 
       if (error) throw error;
 
+      // Add new node to existing nodes immediately
+      const newNode: Node = {
+        id: data.id,
+        type: 'default',
+        position: { x: 200, y: (maxOrder) * 150 + 200 }, // Position below existing nodes
+        data: {
+          label: (
+            <div className="text-center">
+              <div className="font-semibold">{data.component_name}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Step {data.step_order}
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="mt-2"
+                onClick={() => setEditingStep(data)}
+              >
+                <Edit className="h-3 w-3" />
+              </Button>
+            </div>
+          )
+        }
+      };
+
+      // Update nodes state
+      setNodes(prevNodes => {
+        const updatedNodes = [...prevNodes, newNode];
+        
+        // Update edges to connect the new node
+        if (prevNodes.length > 0) {
+          const lastNode = prevNodes[prevNodes.length - 1];
+          const newEdge: Edge = {
+            id: `e${prevNodes.length}`,
+            source: lastNode.id,
+            target: newNode.id,
+            type: 'smoothstep',
+            animated: true
+          };
+          setEdges(prevEdges => [...prevEdges, newEdge]);
+        }
+        
+        return updatedNodes;
+      });
+
+      // Update selectedFlow state to include the new step
+      setSelectedFlow(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          flow_variants: [{
+            ...prev.flow_variants[0],
+            flow_steps: [...prev.flow_variants[0].flow_steps, data]
+          }]
+        };
+      });
+
       toast({
         title: "Success",
         description: "Step added successfully"
       });
 
-      loadFlows();
-      // Refresh the editor view
-      const updatedFlow = flows.find(f => f.id === selectedFlow.id);
-      if (updatedFlow) {
-        openFlowEditor(updatedFlow);
-      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -309,13 +360,43 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
 
       if (error) throw error;
 
+      // Update the node in local state immediately
+      setNodes(prevNodes => 
+        prevNodes.map(node => {
+          if (node.id === stepId) {
+            const stepData = editingStep;
+            return {
+              ...node,
+              data: {
+                label: (
+                  <div className="text-center">
+                    <div className="font-semibold">{stepData?.component_name}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Step {stepData?.step_order}
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="mt-2"
+                      onClick={() => setEditingStep(stepData)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )
+              }
+            };
+          }
+          return node;
+        })
+      );
+
       toast({
         title: "Success",
         description: "Step updated successfully"
       });
 
       setEditingStep(null);
-      loadFlows();
     } catch (error: any) {
       toast({
         title: "Error",
