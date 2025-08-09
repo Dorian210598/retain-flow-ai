@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSession } from '../contexts/SessionContext';
 
 interface FlowStep {
   id: string;
@@ -19,7 +20,6 @@ interface FlowVariant {
 export const useFlowRenderer = (policyId?: string) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [flowVariant, setFlowVariant] = useState<FlowVariant | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const [completionData, setCompletionData] = useState<{
@@ -27,6 +27,7 @@ export const useFlowRenderer = (policyId?: string) => {
     discountData?: any;
   } | null>(null);
   const { toast } = useToast();
+  const { sessionId, setSessionId } = useSession();
 
   useEffect(() => {
     console.log('🚀 useFlowRenderer effect triggered with policyId:', policyId);

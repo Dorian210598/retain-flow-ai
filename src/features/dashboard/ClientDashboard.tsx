@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Shield, Calendar, AlertTriangle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { FlowRenderer } from '@/features/cancellation-flow-renderer/components/FlowRenderer';
+import { SessionProvider } from '@/features/cancellation-flow-renderer/contexts/SessionContext';
 
 interface ClientPolicy {
   id: string;
@@ -82,7 +83,11 @@ export const ClientDashboard = () => {
   };
 
   if (showCancellation && policy) {
-    return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
+    return (
+      <SessionProvider>
+        <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />
+      </SessionProvider>
+    );
   }
 
 

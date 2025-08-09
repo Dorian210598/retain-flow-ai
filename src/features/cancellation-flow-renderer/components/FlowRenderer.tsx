@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle } from 'lucide-react';
 import { useSessionRecorder } from '@/hooks/useSessionRecorder';
+import { useSession } from '../contexts/SessionContext';
 
 interface FlowRendererProps {
   policyId: string;
@@ -12,6 +13,7 @@ interface FlowRendererProps {
 }
 
 export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDashboard }) => {
+  const { sessionId: contextSessionId } = useSession();
   const {
     currentStep,
     loading,
@@ -22,26 +24,25 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
     handleDecline,
     isCompleted,
     completionData,
-    handleResetFlow,
-    sessionId
+    handleResetFlow
   } = useFlowRenderer(policyId);
 
   // Monitor sessionId changes
   useEffect(() => {
-    console.log('🔍 SessionId changed in FlowRenderer:', sessionId);
-  }, [sessionId]);
+    console.log('🔍 SessionId changed in FlowRenderer:', contextSessionId);
+  }, [contextSessionId]);
 
   // Initialize session recording for the current step  
   console.log('🎭 FlowRenderer session recording setup:', { 
-    sessionId, 
+    sessionId: contextSessionId, 
     currentStepId: currentStep?.id, 
     loading, 
     isCompleted,
-    shouldRecord: !!(sessionId && currentStep?.id && !loading && !isCompleted)
+    shouldRecord: !!(contextSessionId && currentStep?.id && !loading && !isCompleted)
   });
   
   useSessionRecorder({
-    sessionId: sessionId || '', 
+    sessionId: contextSessionId || '', 
     stepId: currentStep?.id || '',
     throttleMs: 100
   });
