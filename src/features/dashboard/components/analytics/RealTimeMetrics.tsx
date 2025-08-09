@@ -51,7 +51,7 @@ export const RealTimeMetrics: React.FC = () => {
               const start = new Date(session.start_time).getTime();
               const end = new Date(session.end_time!).getTime();
               return acc + (end - start);
-            }, 0) / completedToday.length / 1000 / 60 // in minutes
+            }, 0) / completedToday.length / 1000 // in seconds, not minutes
           : 0;
 
         const retainedToday = todaySessions?.filter(s => s.outcome === 'retained').length || 0;
@@ -128,10 +128,10 @@ export const RealTimeMetrics: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-700 dark:text-orange-300">
-              {realTimeData.avgResponseTime.toFixed(1)}m
+              {realTimeData.avgResponseTime < 60 ? `${realTimeData.avgResponseTime.toFixed(1)}s` : `${(realTimeData.avgResponseTime / 60).toFixed(1)}m`}
             </div>
             <p className="text-xs text-orange-600 dark:text-orange-400">
-              Time to decision
+              Average completion time
             </p>
           </CardContent>
         </Card>

@@ -101,14 +101,18 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       const retainedSessions = sessions?.filter(s => s.outcome === 'retained').length || 0;
       const retentionRate = totalSessions > 0 ? (retainedSessions / totalSessions) * 100 : 0;
 
-      // Calculate average session time
-      const completedSessions = sessions?.filter(s => s.end_time) || [];
+      // Calculate average session time (filter out mock data with unrealistic times)
+      const completedSessions = sessions?.filter(s => {
+        if (!s.end_time) return false;
+        const duration = new Date(s.end_time).getTime() - new Date(s.start_time).getTime();
+        return duration > 0 && duration < (30 * 60 * 1000); // Exclude sessions longer than 30 minutes (likely mock data)
+      }) || [];
       const totalTime = completedSessions.reduce((acc, session) => {
         const start = new Date(session.start_time).getTime();
         const end = new Date(session.end_time!).getTime();
         return acc + (end - start);
       }, 0);
-      const averageSessionTime = completedSessions.length > 0 ? totalTime / completedSessions.length / 1000 / 60 : 0; // in minutes
+      const averageSessionTime = completedSessions.length > 0 ? totalTime / completedSessions.length / 1000 : 0; // in seconds
 
       // Get offer events
       const offerEvents = sessions?.flatMap(s => 
@@ -351,10 +355,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {analyticsData.averageSessionTime.toFixed(1)}m
+                {analyticsData.averageSessionTime < 60 ? `${analyticsData.averageSessionTime.toFixed(1)}s` : `${(analyticsData.averageSessionTime / 60).toFixed(1)}m`}
               </div>
               <p className="text-xs text-muted-foreground">
-                Time to decision
+                Average completion time
               </p>
             </CardContent>
           </Card>
