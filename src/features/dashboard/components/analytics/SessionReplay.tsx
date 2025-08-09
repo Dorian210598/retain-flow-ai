@@ -100,7 +100,13 @@ export const SessionReplay = ({ onBack }: SessionReplayProps) => {
       .slice(0, currentEventIndex + 1)
       .filter(e => e.event_type === 'mouse_move' && e.event_data?.mouse_position);
 
-    if (mouseEvents.length === 0) return null;
+    console.log('🖱️ Rendering mouse path with events:', mouseEvents.length);
+
+    if (mouseEvents.length === 0) return (
+      <div className="text-center text-muted-foreground py-8">
+        No mouse movement data recorded
+      </div>
+    );
 
     return (
       <div className="relative w-full h-64 bg-muted/20 border rounded-lg overflow-hidden">
@@ -143,6 +149,14 @@ export const SessionReplay = ({ onBack }: SessionReplayProps) => {
 
   const renderEventTimeline = () => {
     const visibleEvents = events.slice(Math.max(0, currentEventIndex - 5), currentEventIndex + 10);
+    
+    console.log('📋 Rendering timeline with events:', visibleEvents.length, 'Current index:', currentEventIndex);
+
+    if (visibleEvents.length === 0) return (
+      <div className="text-center text-muted-foreground py-8">
+        No events recorded for this session
+      </div>
+    );
 
     return (
       <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -188,6 +202,14 @@ export const SessionReplay = ({ onBack }: SessionReplayProps) => {
     const clickEvents = events
       .filter(e => e.event_type === 'click' && e.event_data?.mouse_position)
       .slice(0, currentEventIndex + 1);
+
+    console.log('👆 Rendering heatmap with click events:', clickEvents.length);
+
+    if (clickEvents.length === 0) return (
+      <div className="text-center text-muted-foreground py-8">
+        No click data recorded
+      </div>
+    );
 
     const heatmapData = clickEvents.reduce((acc, event) => {
       const pos = event.event_data.mouse_position;

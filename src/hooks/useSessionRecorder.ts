@@ -85,6 +85,8 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
     const now = Date.now();
     
     if (now - lastThrottleTime.current >= throttleMs) {
+      console.log('🖱️ Mouse move detected:', { x: mouseEvent.clientX, y: mouseEvent.clientY });
+      
       const mouseData = {
         x: mouseEvent.clientX,
         y: mouseEvent.clientY,
@@ -111,6 +113,8 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
     const mouseEvent = e as any; // DOM MouseEvent
     const target = e.target as Element;
     
+    console.log('👆 Click detected:', { x: mouseEvent.clientX, y: mouseEvent.clientY, target: target.tagName });
+    
     recordEvent('click', {
       mouse_position: { x: mouseEvent.clientX, y: mouseEvent.clientY },
       element_selector: getElementSelector(target),
@@ -120,6 +124,8 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
   }, [recordEvent, getElementSelector]);
 
   const handleScroll = useCallback(() => {
+    console.log('📜 Scroll detected:', { x: window.scrollX, y: window.scrollY });
+    
     recordEvent('scroll', {
       scroll_position: {
         x: window.scrollX,
