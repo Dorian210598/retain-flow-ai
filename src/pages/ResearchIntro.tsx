@@ -55,21 +55,21 @@ const ResearchIntro = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">
         <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
-          <CardHeader className="text-center pb-8">
+          <CardHeader className="text-center pb-6 sm:pb-8">
             <div className="flex justify-center mb-4">
               {currentSlideData.icon}
             </div>
-            <CardTitle className="text-3xl font-bold mb-2">
+            <CardTitle className="text-2xl sm:text-3xl font-bold mb-2">
               {currentSlideData.title}
             </CardTitle>
-            <CardDescription className="text-lg text-primary font-medium">
+            <CardDescription className="text-base sm:text-lg text-primary font-medium">
               {currentSlideData.subtitle}
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-8">
+          <CardContent className="space-y-6 sm:space-y-8">
             <div className="text-center">
-              <p className="text-lg leading-relaxed text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground max-w-3xl mx-auto">
                 {currentSlideData.content}
               </p>
             </div>
@@ -87,27 +87,28 @@ const ResearchIntro = () => {
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-between items-center pt-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-6 gap-4 sm:gap-0">
               <Button
                 variant="outline"
                 onClick={prevSlide}
                 disabled={currentSlide === 0}
-                className="px-6"
+                className="px-4 sm:px-6 w-full sm:w-auto order-2 sm:order-1"
               >
                 Wstecz
               </Button>
 
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground order-1 sm:order-2">
                 {currentSlide + 1} z {slides.length}
               </div>
 
               <Button
                 onClick={nextSlide}
-                className="px-6 gap-2"
+                className="px-4 sm:px-6 gap-2 w-full sm:w-auto order-3"
               >
                 {currentSlide === slides.length - 1 ? (
                   <>
-                    Rozpocznij badanie
+                    <span className="hidden sm:inline">Rozpocznij badanie</span>
+                    <span className="sm:hidden">Rozpocznij</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 ) : (
@@ -118,12 +119,16 @@ const ResearchIntro = () => {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-8">
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <BookOpen className="w-4 h-4" />
-            <span>Badanie naukowe prowadzone na Uniwersytecie WSB Merito w Gdańsku</span>
+        <div className="text-center mt-6 sm:mt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              <span className="text-center">Badanie naukowe prowadzone na Uniwersytecie WSB Merito w Gdańsku</span>
+            </div>
           </div>
-          <span className='text-sm text-muted-foreground'>Autor: Dorian Opacki / dorianwew@gmail.com</span>
+          <div className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Autor: Dorian Opacki / dorianwew@gmail.com
+          </div>
           <p className="text-xs text-muted-foreground mt-2">
             Czas trwania: około 5-10 minut
           </p>

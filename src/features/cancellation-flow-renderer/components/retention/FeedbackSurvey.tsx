@@ -35,10 +35,10 @@ export const FeedbackSurvey: React.FC<FeedbackSurveyProps> = ({
   };
 
   return (
-    <div className={cn("max-w-2xl mx-auto p-6", className)}>
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-4">{title}</h2>
-        <p className="text-muted-foreground">{description}</p>
+    <div className={cn("max-w-2xl mx-auto p-4 sm:p-6", className)}>
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4">{title}</h2>
+        <p className="text-sm sm:text-base text-muted-foreground">{description}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -75,10 +75,10 @@ export const FeedbackSurvey: React.FC<FeedbackSurveyProps> = ({
           </div>
         ))}
 
-        <div className="flex justify-end pt-4">
+        <div className="flex justify-center sm:justify-end pt-4">
           <button
             type="submit"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-lg font-medium"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-lg font-medium w-full sm:w-auto"
           >
             Continue
           </button>
