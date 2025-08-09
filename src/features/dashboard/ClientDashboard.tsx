@@ -3,7 +3,8 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Calendar, AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Shield, Calendar, AlertTriangle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { FlowRenderer } from '@/features/cancellation-flow-renderer/components/FlowRenderer';
 
@@ -99,9 +100,21 @@ export const ClientDashboard = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">My Insurance Policy</h1>
-            <p className="text-muted-foreground">Welcome back, {profile?.full_name}</p>
+          <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-2xl font-bold">My Insurance Policy</h1>
+              <p className="text-muted-foreground">Welcome back, {profile?.full_name}</p>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-5 h-5 cursor-help text-muted-foreground hover:text-primary ml-2" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  <p>To w badaniu symulujemy przykładową polisę ubezpieczeniową. Kliknij "Start Cancellation Process", aby przejść przez proces anulowania i zobaczyć różne strategie retencji.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <Button variant="outline" onClick={signOut}>
             Sign Out
@@ -173,6 +186,16 @@ export const ClientDashboard = () => {
                   <CardTitle className="flex items-center gap-2 text-destructive">
                     <AlertTriangle className="h-5 w-5" />
                     Cancel Policy
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 cursor-help text-muted-foreground hover:text-primary ml-1" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          <p>To jest główny element badania - przycisk inicjujący proces anulowania polisy. Po kliknięciu przejdziesz przez różne etapy, które mogą zawierać oferty specjalne, ankiety czy propozycje rozmów.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </CardTitle>
                   <CardDescription>
                     Need to cancel your insurance policy?

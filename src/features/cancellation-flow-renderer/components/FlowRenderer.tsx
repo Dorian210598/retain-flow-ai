@@ -2,6 +2,8 @@ import React from 'react';
 import { useFlowRenderer } from '../hooks/useFlowRenderer';
 import { componentMap } from './componentMap';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HelpCircle } from 'lucide-react';
 
 interface FlowRendererProps {
   policyId: string;
@@ -87,7 +89,19 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
       <div className="bg-card border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold">Policy Cancellation</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold">Policy Cancellation</h1>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-4 h-4 cursor-help text-muted-foreground hover:text-primary" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-sm">
+                    <p>Przechodzisz przez wieloetapowy proces anulowania. Każdy etap może zawierać różne oferty lub pytania mające na celu zatrzymanie Cię jako klienta. Obserwuj, jak różne strategie wpływają na Twoje decyzje.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <div className="text-sm text-muted-foreground">
               Step {currentStepIndex + 1} of {totalSteps}
             </div>
