@@ -35,6 +35,11 @@ export const useFlowRenderer = (policyId?: string) => {
     }
   }, [policyId]);
 
+  // Force re-render when sessionId changes
+  useEffect(() => {
+    console.log('🔥 SessionId effect triggered:', sessionId);
+  }, [sessionId]);
+
   const loadActiveFlow = async () => {
     try {
       // Get active flow for the organization
@@ -196,7 +201,7 @@ export const useFlowRenderer = (policyId?: string) => {
   console.log('🔄 useFlowRenderer returning state:', {
     hasCurrentStep: !!currentStep,
     hasFlowVariant: !!flowVariant,
-    sessionId: sessionId,
+    sessionId: sessionId, // This should show the actual sessionId now
     currentStepIndex,
     totalSteps: flowVariant?.flow_steps.length ?? 0,
     loading,
@@ -215,6 +220,6 @@ export const useFlowRenderer = (policyId?: string) => {
     isCompleted,
     completionData,
     handleResetFlow,
-    sessionId
+    sessionId // Make sure sessionId is properly returned
   };
 };
