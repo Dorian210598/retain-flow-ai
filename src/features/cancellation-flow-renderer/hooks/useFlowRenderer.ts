@@ -92,14 +92,15 @@ export const useFlowRenderer = (policyId?: string) => {
       }
       
       console.log('✅ Session created successfully:', session);
-      console.log('📝 Setting sessionId to:', session.id);
-      setSessionId(session.id);
-      console.log('📝 SessionId state updated to:', session.id);
+      console.log('📝 About to set sessionId to:', session.id);
       
-      // Force a small delay to ensure state is updated
-      setTimeout(() => {
-        console.log('🔄 SessionId after timeout:', sessionId);
-      }, 100);
+      // Force state update with callback to ensure it's set
+      setSessionId(prevId => {
+        console.log('🔄 SessionId changing from', prevId, 'to', session.id);
+        return session.id;
+      });
+      
+      console.log('📝 setSessionId called with:', session.id);
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
@@ -198,7 +199,7 @@ export const useFlowRenderer = (policyId?: string) => {
   console.log('🔄 useFlowRenderer returning state:', {
     hasCurrentStep: !!currentStep,
     hasFlowVariant: !!flowVariant,
-    sessionId,
+    sessionId: sessionId,
     currentStepIndex,
     totalSteps: flowVariant?.flow_steps.length ?? 0,
     loading,
