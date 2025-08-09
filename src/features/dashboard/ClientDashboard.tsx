@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useOwlGuide } from '@/components/OwlGuideProvider';
 import { Shield, Calendar, AlertTriangle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { FlowRenderer } from '@/features/cancellation-flow-renderer/components/FlowRenderer';
@@ -25,7 +24,6 @@ interface ClientPolicy {
 
 export const ClientDashboard = () => {
   const { profile, signOut } = useAuth();
-  const { showOwlMessage } = useOwlGuide();
   const [policy, setPolicy] = useState<ClientPolicy | null>(null);
   const [showCancellation, setShowCancellation] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -87,21 +85,6 @@ export const ClientDashboard = () => {
     return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
   }
 
-  // Show welcome message only once - with proper dependency array
-  useEffect(() => {
-    if (!loading && policy) {
-      const timer = setTimeout(() => {
-        showOwlMessage({
-          message: "To jest panel klienta z przykładową polisą. Kliknij 'Start Cancellation Process' aby rozpocząć badanie! 📋",
-          position: 'bottom-right',
-          autoClose: true,
-          delay: 5000
-        });
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [loading, policy]); // Removed showOwlMessage from dependencies
 
   if (loading) {
     return (
