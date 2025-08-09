@@ -44,18 +44,28 @@ export const useFlowRenderer = (policyId?: string) => {
           )
         `)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
-      if (flowError) throw flowError;
+      if (flowError) {
+        console.error('Flow error:', flowError);
+        throw flowError;
+      }
+
+      if (!flows) {
+        throw new Error('No active cancellation flow found');
+      }
+
+      console.log('Loaded flow:', flows);
 
       // For now, use the first variant (in a real app, this would be A/B test logic)
-      const variant = flows.flow_variants[0];
+      const variant = flows.flow_variants?.[0];
       if (!variant) throw new Error('No flow variants found');
 
       // Sort steps by order
       variant.flow_steps.sort((a: any, b: any) => a.step_order - b.step_order);
       
       setFlowVariant(variant);
+      console.log('Flow variant set:', variant);
 
       // Create a new session
       const { data: session, error: sessionError } = await supabase
@@ -68,14 +78,19 @@ export const useFlowRenderer = (policyId?: string) => {
         .select()
         .single();
 
-      if (sessionError) throw sessionError;
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw sessionError;
+      }
+      
+      console.log('Session created:', session);
       setSessionId(session.id);
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
       toast({
         title: "Error",
-        description: "Failed to load cancellation flow",
+        description: error.message || "Failed to load cancellation flow",
         variant: "destructive"
       });
     } finally {
