@@ -29,6 +29,7 @@ export const useFlowRenderer = (policyId?: string) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('🚀 useFlowRenderer effect triggered with policyId:', policyId);
     if (policyId) {
       loadActiveFlow();
     }
@@ -73,6 +74,8 @@ export const useFlowRenderer = (policyId?: string) => {
       console.log('Flow variant set:', variant);
 
       // Create a new session
+      console.log('🎬 Creating new session for policy:', policyId, 'variant:', variant.id);
+      
       const { data: session, error: sessionError } = await supabase
         .from('flow_sessions')
         .insert({
@@ -84,12 +87,13 @@ export const useFlowRenderer = (policyId?: string) => {
         .single();
 
       if (sessionError) {
-        console.error('Session error:', sessionError);
+        console.error('❌ Session error:', sessionError);
         throw sessionError;
       }
       
-      console.log('Session created:', session);
+      console.log('✅ Session created successfully:', session);
       setSessionId(session.id);
+      console.log('📝 SessionId set to:', session.id);
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
@@ -184,6 +188,16 @@ export const useFlowRenderer = (policyId?: string) => {
   };
 
   const currentStep = flowVariant?.flow_steps[currentStepIndex];
+
+  console.log('🔄 useFlowRenderer returning state:', {
+    hasCurrentStep: !!currentStep,
+    hasFlowVariant: !!flowVariant,
+    sessionId,
+    currentStepIndex,
+    totalSteps: flowVariant?.flow_steps.length ?? 0,
+    loading,
+    isCompleted
+  });
 
   return {
     currentStep,
