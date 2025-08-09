@@ -6,9 +6,11 @@ import { Settings, BarChart3, Users, Workflow } from 'lucide-react';
 import { FlowBuilder } from './FlowBuilder';
 import { Analytics } from './Analytics';
 import { ClientManagement } from './ClientManagement';
+import { useAdminStats } from './hooks/useAdminStats';
 
 export const AdminDashboard = () => {
   const { profile, signOut } = useAuth();
+  const { stats } = useAdminStats();
   const [currentView, setCurrentView] = useState<'dashboard' | 'flow-builder' | 'analytics' | 'clients'>('dashboard');
 
   if (currentView === 'flow-builder') {
@@ -118,19 +120,27 @@ export const AdminDashboard = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {stats.loading ? '...' : stats.activeFlows}
+                  </div>
                   <div className="text-sm text-muted-foreground">Active Flows</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {stats.loading ? '...' : stats.totalSessions}
+                  </div>
                   <div className="text-sm text-muted-foreground">Total Sessions</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary">0%</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {stats.loading ? '...' : `${stats.retentionRate}%`}
+                  </div>
                   <div className="text-sm text-muted-foreground">Retention Rate</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {stats.loading ? '...' : stats.totalClients}
+                  </div>
                   <div className="text-sm text-muted-foreground">Clients</div>
                 </div>
               </div>
