@@ -196,6 +196,7 @@ export const useFlowRenderer = (policyId?: string) => {
     handleDecline,
     isCompleted,
     completionData,
-    handleResetFlow
+    handleResetFlow,
+    sessionId
   };
 };

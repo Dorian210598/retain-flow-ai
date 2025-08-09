@@ -399,6 +399,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_session_replay_data: {
+        Args: { session_uuid: string }
+        Returns: {
+          event_id: string
+          event_type: string
+          event_timestamp: string
+          event_data: Json
+          component_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "client"

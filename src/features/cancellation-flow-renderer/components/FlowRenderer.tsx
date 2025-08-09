@@ -4,6 +4,7 @@ import { componentMap } from './componentMap';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle } from 'lucide-react';
+import { useSessionRecorder } from '@/hooks/useSessionRecorder';
 
 interface FlowRendererProps {
   policyId: string;
@@ -21,8 +22,18 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
     handleDecline,
     isCompleted,
     completionData,
-    handleResetFlow
+    handleResetFlow,
+    sessionId
   } = useFlowRenderer(policyId);
+
+  // Initialize session recording for the current step
+  const shouldRecord = sessionId && currentStep?.id && !loading && !isCompleted;
+  
+  useSessionRecorder({
+    sessionId: sessionId || '',
+    stepId: currentStep?.id || '',
+    throttleMs: 100
+  });
 
   console.log('FlowRenderer state:', { isCompleted, completionData, currentStep });
 

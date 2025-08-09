@@ -11,6 +11,7 @@ import { RealTimeMetrics } from './components/analytics/RealTimeMetrics';
 import { HeatmapChart } from './components/analytics/HeatmapChart';
 import { FunnelAnalysis } from './components/analytics/FunnelAnalysis';
 import { ExportControls } from './components/analytics/ExportControls';
+import { SessionReplay } from './components/analytics/SessionReplay';
 
 interface AnalyticsProps {
   onBack?: () => void;
@@ -394,12 +395,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
         <RealTimeMetrics />
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="realtime">Real-time</TabsTrigger>
-            <TabsTrigger value="flows">Flow Performance</TabsTrigger>
-            <TabsTrigger value="behavior">User Behavior</TabsTrigger>
-            <TabsTrigger value="offers">Offer Analysis</TabsTrigger>
+            <TabsTrigger value="flows">Flows</TabsTrigger>
+            <TabsTrigger value="behavior">Behavior</TabsTrigger>
+            <TabsTrigger value="offers">Offers</TabsTrigger>
+            <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
           </TabsList>
 
@@ -545,6 +547,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="sessions" className="space-y-4">
+            <SessionReplay />
           </TabsContent>
 
           <TabsContent value="export" className="space-y-6">
