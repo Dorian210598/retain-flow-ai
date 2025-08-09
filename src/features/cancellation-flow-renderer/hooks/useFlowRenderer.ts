@@ -92,7 +92,7 @@ export const useFlowRenderer = (policyId?: string) => {
         throw sessionError;
       }
       
-      console.log('🔥 NEW CODE: Session created successfully:', session);
+      console.log('🔥 FORCED UNIQUE LOG 12345: Session created successfully:', session);
       console.log('📝 About to set sessionId to:', session.id);
       
       try {
