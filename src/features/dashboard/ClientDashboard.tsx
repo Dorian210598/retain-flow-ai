@@ -76,8 +76,12 @@ export const ClientDashboard = () => {
     }
   };
 
+  const handleBackToDashboard = () => {
+    setShowCancellation(false);
+  };
+
   if (showCancellation && policy) {
-    return <FlowRenderer policyId={policy.id} />;
+    return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
   }
 
   if (loading) {

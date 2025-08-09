@@ -5,9 +5,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface FlowRendererProps {
   policyId: string;
+  onBackToDashboard?: () => void;
 }
 
-export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId }) => {
+export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDashboard }) => {
   const {
     currentStep,
     loading,
@@ -49,7 +50,7 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId }) => {
           <CompletionSummary
             outcome={completionData.outcome}
             discountData={completionData.discountData}
-            onClose={handleResetFlow}
+            onClose={onBackToDashboard || handleResetFlow}
           />
         </main>
       </div>
