@@ -61,7 +61,7 @@ export const useFlowRenderer = (policyId?: string) => {
         throw new Error('No active cancellation flow found');
       }
 
-      console.log('Loaded flow:', flows);
+      console.log('🆕 SUPER NEW LOG: Loaded flow:', flows);
 
       // For now, use the first variant (in a real app, this would be A/B test logic)
       const variant = flows.flow_variants?.[0];
@@ -71,10 +71,10 @@ export const useFlowRenderer = (policyId?: string) => {
       variant.flow_steps.sort((a: any, b: any) => a.step_order - b.step_order);
       
       setFlowVariant(variant);
-      console.log('Flow variant set:', variant);
+      console.log('🆕 VARIANT SET: Flow variant set:', variant);
 
       // Create a new session
-      console.log('🎬 Creating new session for policy:', policyId, 'variant:', variant.id);
+      console.log('🆕 CREATING SESSION for policy:', policyId, 'variant:', variant.id);
       
       const { data: session, error: sessionError } = await supabase
         .from('flow_sessions')
@@ -85,32 +85,20 @@ export const useFlowRenderer = (policyId?: string) => {
         })
         .select()
         .single();
-      console.log('🔥 BEFORE SESSION CHECK - sessionError:', sessionError);
       
       if (sessionError) {
         console.error('❌ Session error:', sessionError);
         throw sessionError;
       }
       
-      console.log('🔥 MEGA UNIQUE LOG 999999: Session created successfully:', session);
-      console.log('📝 About to set sessionId to:', session.id);
+      console.log('🆕 SESSION CREATED SUCCESSFULLY:', session);
+      console.log('🆕 SETTING SESSION ID TO:', session.id);
       
-      try {
-        // Force state update with callback to ensure it's set
-        setSessionId(prevId => {
-          console.log('🔄 SessionId changing from', prevId, 'to', session.id);
-          return session.id;
-        });
-        console.log('📝 setSessionId called successfully with:', session.id);
-        
-        // Force a re-render by updating loading state
-        setTimeout(() => {
-          console.log('🔄 Forcing re-render after sessionId set');
-          setLoading(false);
-        }, 0);
-      } catch (setError) {
-        console.error('❌ Error in setSessionId:', setError);
-      }
+      // Immediately set both sessionId and loading state
+      setSessionId(session.id);
+      setLoading(false);
+      
+      console.log('🆕 STATE UPDATED - sessionId set and loading false');
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
@@ -119,7 +107,6 @@ export const useFlowRenderer = (policyId?: string) => {
         description: error.message || "Failed to load cancellation flow",
         variant: "destructive"
       });
-    } finally {
       setLoading(false);
     }
   };
