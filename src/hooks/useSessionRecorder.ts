@@ -58,8 +58,9 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
   }, [getElementSelector]);
 
   const recordEvent = useCallback(async (eventType: string, eventData: any) => {
+    console.log('🎥 Recording event:', eventType, eventData);
     try {
-      await supabase.from('interaction_events').insert({
+      const result = await supabase.from('interaction_events').insert({
         session_id: sessionId,
         step_id: stepId,
         event_type: eventType,
@@ -73,8 +74,9 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
           session_duration: Date.now() - sessionStartTime.current
         }
       });
+      console.log('✅ Event recorded successfully:', result);
     } catch (error) {
-      console.error('Failed to record event:', error);
+      console.error('❌ Failed to record event:', error);
     }
   }, [sessionId, stepId]);
 
@@ -139,8 +141,15 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
   }, [recordEvent]);
 
   useEffect(() => {
-    if (!sessionId || !stepId) return;
+    console.log('🎬 useSessionRecorder mounting with:', { sessionId, stepId, hasSessionId: !!sessionId, hasStepId: !!stepId });
+    
+    if (!sessionId || !stepId) {
+      console.log('⚠️ Session recording skipped - missing sessionId or stepId');
+      return;
+    }
 
+    console.log('🚀 Starting session recording...');
+    
     // Add event listeners
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('click', handleClick);
@@ -148,6 +157,7 @@ export const useSessionRecorder = ({ sessionId, stepId, throttleMs = 100 }: Sess
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Record session start
+    console.log('📝 Recording session_start event');
     recordEvent('session_start', {
       user_agent: navigator.userAgent,
       referrer: document.referrer

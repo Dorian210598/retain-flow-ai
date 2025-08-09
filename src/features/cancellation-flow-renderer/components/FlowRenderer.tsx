@@ -27,7 +27,13 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
   } = useFlowRenderer(policyId);
 
   // Initialize session recording for the current step
-  const shouldRecord = sessionId && currentStep?.id && !loading && !isCompleted;
+  console.log('🎭 FlowRenderer session recording setup:', { 
+    sessionId, 
+    currentStepId: currentStep?.id, 
+    loading, 
+    isCompleted,
+    shouldRecord: !!(sessionId && currentStep?.id && !loading && !isCompleted)
+  });
   
   useSessionRecorder({
     sessionId: sessionId || '',
