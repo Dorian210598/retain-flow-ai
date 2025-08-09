@@ -7,6 +7,10 @@ import { ArrowLeft, TrendingUp, TrendingDown, Users, Target, Clock, DollarSign }
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { RealTimeMetrics } from './components/analytics/RealTimeMetrics';
+import { HeatmapChart } from './components/analytics/HeatmapChart';
+import { FunnelAnalysis } from './components/analytics/FunnelAnalysis';
+import { ExportControls } from './components/analytics/ExportControls';
 
 interface AnalyticsProps {
   onBack?: () => void;
@@ -25,6 +29,8 @@ interface AnalyticsData {
   cancellationReasons: Array<{ reason: string; count: number }>;
   hourlyPattern: Array<{ hour: number; sessions: number }>;
   offerAnalysis: Array<{ discountPercent: number; acceptanceRate: number; count: number }>;
+  heatmapData: Array<{ hour: number; day: string; value: number; sessions: number }>;
+  funnelData: Array<{ step: string; users: number; dropoffRate: number; conversionRate: number; avgTimeSpent: number }>;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -45,7 +51,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
     stepDropoff: [],
     cancellationReasons: [],
     hourlyPattern: [],
-    offerAnalysis: []
+    offerAnalysis: [],
+    heatmapData: [],
+    funnelData: []
   });
 
   useEffect(() => {
@@ -185,6 +193,54 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
         { discountPercent: 30, acceptanceRate: 92, count: 8 }
       ];
 
+      // Heatmap data - activity by hour and day
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const heatmapData = [];
+      for (const day of days) {
+        for (let hour = 0; hour < 24; hour++) {
+          const sessionsAtTime = sessions?.filter(s => {
+            const sessionDate = new Date(s.created_at);
+            const sessionDay = days[sessionDate.getDay() === 0 ? 6 : sessionDate.getDay() - 1]; // Convert Sunday=0 to our format
+            const sessionHour = sessionDate.getHours();
+            return sessionDay === day && sessionHour === hour;
+          }) || [];
+          
+          const retainedAtTime = sessionsAtTime.filter(s => s.outcome === 'retained').length;
+          const retentionAtTime = sessionsAtTime.length > 0 ? (retainedAtTime / sessionsAtTime.length) * 100 : 0;
+          
+          heatmapData.push({
+            hour,
+            day,
+            value: retentionAtTime,
+            sessions: sessionsAtTime.length
+          });
+        }
+      }
+
+      // Funnel analysis with enhanced metrics
+      const funnelSteps = [
+        'Feedback Survey',
+        'Discount Offer',
+        'Service Upgrade',
+        'Final Confirmation'
+      ];
+
+      const funnelData = funnelSteps.map((step, index) => {
+        const stepSessions = Math.floor(totalSessions * Math.pow(0.8, index)); // Mock drop-off
+        const nextStepSessions = index < funnelSteps.length - 1 ? Math.floor(totalSessions * Math.pow(0.8, index + 1)) : stepSessions;
+        const dropoffRate = stepSessions > 0 ? ((stepSessions - nextStepSessions) / stepSessions) * 100 : 0;
+        const conversionRate = totalSessions > 0 ? (stepSessions / totalSessions) * 100 : 0;
+        const avgTimeSpent = 2 + Math.random() * 3; // Mock time data
+
+        return {
+          step,
+          users: stepSessions,
+          dropoffRate,
+          conversionRate,
+          avgTimeSpent
+        };
+      });
+
       setAnalyticsData({
         totalSessions,
         retentionRate,
@@ -197,7 +253,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
         stepDropoff,
         cancellationReasons,
         hourlyPattern,
-        offerAnalysis
+        offerAnalysis,
+        heatmapData,
+        funnelData
       });
 
     } catch (error: any) {
@@ -317,12 +375,17 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
           </Card>
         </div>
 
+        {/* Real-time metrics section */}
+        <RealTimeMetrics />
+
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="realtime">Real-time</TabsTrigger>
             <TabsTrigger value="flows">Flow Performance</TabsTrigger>
             <TabsTrigger value="behavior">User Behavior</TabsTrigger>
             <TabsTrigger value="offers">Offer Analysis</TabsTrigger>
+            <TabsTrigger value="export">Export</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -366,6 +429,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="realtime" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <HeatmapChart data={analyticsData.heatmapData} />
+              <FunnelAnalysis data={analyticsData.funnelData} />
+            </div>
           </TabsContent>
 
           <TabsContent value="flows" className="space-y-6">
@@ -460,6 +530,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="export" className="space-y-6">
+            <ExportControls timeRange={timeRange} />
           </TabsContent>
         </Tabs>
       </main>
