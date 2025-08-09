@@ -92,8 +92,14 @@ export const useFlowRenderer = (policyId?: string) => {
       }
       
       console.log('✅ Session created successfully:', session);
+      console.log('📝 Setting sessionId to:', session.id);
       setSessionId(session.id);
-      console.log('📝 SessionId set to:', session.id);
+      console.log('📝 SessionId state updated to:', session.id);
+      
+      // Force a small delay to ensure state is updated
+      setTimeout(() => {
+        console.log('🔄 SessionId after timeout:', sessionId);
+      }, 100);
 
     } catch (error: any) {
       console.error('Error loading flow:', error);
