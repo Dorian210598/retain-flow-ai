@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { AuthForm } from './AuthForm';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProtectedRouteProps {
@@ -10,6 +10,13 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && (!user || !profile)) {
+      navigate('/auth');
+    }
+  }, [loading, user, profile, navigate]);
 
   if (loading) {
     return (
@@ -24,7 +31,7 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
   }
 
   if (!user || !profile) {
-    return <AuthForm />;
+    return null; // Will redirect via useEffect
   }
 
   if (requiredRole && profile.role !== requiredRole) {

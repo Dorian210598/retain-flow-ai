@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,13 +15,24 @@ export const AuthForm = () => {
   const [role, setRole] = useState<'admin' | 'client'>('client');
   const [organizationName, setOrganizationName] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, profile } = useAuth();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (user && profile) {
+      navigate('/dashboard');
+    }
+  }, [user, profile, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn(email, password);
+    const result = await signIn(email, password);
+    if (result.data && !result.error) {
+      navigate('/dashboard');
+    }
     setLoading(false);
   };
 
@@ -34,7 +46,11 @@ export const AuthForm = () => {
       return;
     }
     
-    await signUp(email, password, fullName, role, organizationName);
+    const result = await signUp(email, password, fullName, role, organizationName);
+    if (result.data && !result.error) {
+      // Note: User will need to verify email, so don't redirect immediately
+      // The auth state change will handle redirection after verification
+    }
     setLoading(false);
   };
 
