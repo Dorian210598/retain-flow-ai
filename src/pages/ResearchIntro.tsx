@@ -123,7 +123,7 @@ const ResearchIntro = () => {
             <BookOpen className="w-4 h-4" />
             <span>Badanie naukowe prowadzone na Uniwersytecie WSB Merito w Gdańsku</span>
           </div>
-          <span>Autor: Dorian Opacki / dorianwew@gmail.com</span>
+          <span className='text-sm text-muted-foreground'>Autor: Dorian Opacki / dorianwew@gmail.com</span>
           <p className="text-xs text-muted-foreground mt-2">
             Czas trwania: około 5-10 minut
           </p>
