@@ -28,10 +28,18 @@ export const ClientDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadClientPolicy();
-  }, []);
+    if (profile?.id) {
+      loadClientPolicy();
+    }
+  }, [profile?.id]);
 
   const loadClientPolicy = async () => {
+    if (!profile?.id) {
+      console.log('No profile ID available yet');
+      return;
+    }
+
+    console.log('Loading policy for user:', profile.id);
     try {
       const { data, error } = await supabase
         .from('client_policies')
@@ -46,6 +54,7 @@ export const ClientDashboard = () => {
         .eq('status', 'active')
         .maybeSingle();
 
+      console.log('Query result:', data);
       if (error) {
         console.error('Error loading policy:', error);
       } else {
