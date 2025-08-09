@@ -21,6 +21,8 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId }) => {
     handleResetFlow
   } = useFlowRenderer(policyId);
 
+  console.log('FlowRenderer state:', { isCompleted, completionData, currentStep });
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

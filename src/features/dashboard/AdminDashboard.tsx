@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings, BarChart3, Users, Workflow } from 'lucide-react';
+import { FlowBuilder } from './FlowBuilder';
 
 export const AdminDashboard = () => {
   const { profile, signOut } = useAuth();
+  const [currentView, setCurrentView] = useState<'dashboard' | 'flow-builder'>('dashboard');
+
+  if (currentView === 'flow-builder') {
+    return <FlowBuilder onBack={() => setCurrentView('dashboard')} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,7 +45,7 @@ export const AdminDashboard = () => {
               </p>
               <Button 
                 className="w-full"
-                onClick={() => alert('Flow Builder feature coming soon!')}
+                onClick={() => setCurrentView('flow-builder')}
               >
                 Build Flows
               </Button>

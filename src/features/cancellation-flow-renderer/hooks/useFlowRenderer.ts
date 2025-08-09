@@ -129,11 +129,13 @@ export const useFlowRenderer = (policyId?: string) => {
     if (currentStepIndex < (flowVariant?.flow_steps.length ?? 0) - 1) {
       setCurrentStepIndex(prev => prev + 1);
     } else {
+      console.log('Completing session with outcome: cancelled');
       await completeSession('cancelled');
     }
   };
 
   const handleAccept = async (data?: any) => {
+    console.log('Handle accept called with data:', data);
     await trackEvent('offer_accepted', data);
     await completeSession('retained', data);
   };
@@ -144,6 +146,7 @@ export const useFlowRenderer = (policyId?: string) => {
   };
 
   const completeSession = async (outcome: 'retained' | 'cancelled', data?: any) => {
+    console.log('completeSession called with:', { outcome, data, sessionId });
     if (!sessionId) return;
 
     try {
@@ -156,11 +159,13 @@ export const useFlowRenderer = (policyId?: string) => {
         .eq('id', sessionId);
 
       // Set completion state instead of just showing toast
+      console.log('Setting completion data:', { outcome, discountData: data });
       setCompletionData({
         outcome,
         discountData: data
       });
       setIsCompleted(true);
+      console.log('Completion state set, isCompleted should be true');
 
     } catch (error) {
       console.error('Error completing session:', error);
