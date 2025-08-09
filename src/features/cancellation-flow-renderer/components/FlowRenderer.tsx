@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFlowRenderer } from '../hooks/useFlowRenderer';
 import { componentMap } from './componentMap';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +26,12 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
     sessionId
   } = useFlowRenderer(policyId);
 
-  // Initialize session recording for the current step
+  // Monitor sessionId changes
+  useEffect(() => {
+    console.log('🔍 SessionId changed in FlowRenderer:', sessionId);
+  }, [sessionId]);
+
+  // Initialize session recording for the current step  
   console.log('🎭 FlowRenderer session recording setup:', { 
     sessionId, 
     currentStepId: currentStep?.id, 
