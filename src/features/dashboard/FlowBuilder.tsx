@@ -54,6 +54,10 @@ interface FlowStep {
 const componentTypes = [
   { value: 'FeedbackSurvey', label: 'Feedback Survey', description: 'Collect cancellation reasons' },
   { value: 'DiscountOffer', label: 'Discount Offer', description: 'Present retention offers' },
+  { value: 'CallbackScheduler', label: 'Callback Scheduler', description: 'Schedule support calls' },
+  { value: 'ServiceUpgrade', label: 'Service Upgrade', description: 'Offer premium plans' },
+  { value: 'PauseSubscription', label: 'Pause Subscription', description: 'Temporary suspension option' },
+  { value: 'LoyaltyReward', label: 'Loyalty Reward', description: 'Special offers for loyal customers' },
   { value: 'FinalConfirmation', label: 'Final Confirmation', description: 'Confirm cancellation' }
 ];
 
@@ -61,13 +65,67 @@ const defaultConfigs = {
   FeedbackSurvey: {
     title: "Why are you cancelling?",
     description: "Help us understand your reasons",
-    reasons: ["Too expensive", "Not using it", "Found alternative", "Technical issues"]
+    questions: [
+      {
+        id: "reason",
+        type: "select",
+        label: "What's your main reason for cancelling?",
+        options: ["Too expensive", "Not using it", "Found alternative", "Technical issues"],
+        required: true
+      }
+    ]
   },
   DiscountOffer: {
     title: "Special Offer Just For You",
     description: "We'd hate to see you go. Here's an exclusive discount to help you stay.",
     discountPercent: 20,
     discountDuration: 3
+  },
+  CallbackScheduler: {
+    title: "Schedule a callback",
+    description: "Let's discuss your concerns personally. Schedule a quick call with our support team.",
+    availableSlots: [
+      { date: "2024-01-15", time: "10:00 AM", available: true },
+      { date: "2024-01-15", time: "2:00 PM", available: true },
+      { date: "2024-01-16", time: "11:00 AM", available: true }
+    ]
+  },
+  ServiceUpgrade: {
+    title: "Upgrade your experience", 
+    description: "Get more value with our premium features. Upgrade now and stay with us.",
+    upgrades: [
+      {
+        id: "premium",
+        name: "Premium Plan",
+        description: "Enhanced features for power users",
+        features: ["Priority Support", "Advanced Analytics", "Custom Integrations"],
+        price: 49,
+        originalPrice: 69,
+        popular: true
+      }
+    ]
+  },
+  PauseSubscription: {
+    title: "Take a break instead",
+    description: "Not ready to cancel? Pause your subscription temporarily and come back when you're ready.",
+    pauseOptions: [
+      { duration: 30, label: "1 Month", description: "Perfect for a short break" },
+      { duration: 90, label: "3 Months", description: "Ideal for seasonal breaks" },
+      { duration: 180, label: "6 Months", description: "Extended pause option" }
+    ]
+  },
+  LoyaltyReward: {
+    title: "Thank you for your loyalty",
+    description: "You've been with us for a while, and we truly appreciate your loyalty. Here's something special just for you.",
+    customerTenure: 12,
+    rewards: [
+      {
+        type: "discount",
+        title: "50% Off Next 3 Months",
+        description: "Exclusive discount for loyal customers",
+        value: "50% OFF"
+      }
+    ]
   },
   FinalConfirmation: {
     title: "Are you sure?",
