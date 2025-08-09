@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 import { OwlGuide } from '@/components/OwlGuide';
 
 interface OwlMessage {
@@ -32,7 +32,7 @@ interface OwlGuideProviderProps {
 export const OwlGuideProvider: React.FC<OwlGuideProviderProps> = ({ children }) => {
   const [messages, setMessages] = useState<OwlMessage[]>([]);
 
-  const showOwlMessage = (messageData: Omit<OwlMessage, 'id'>) => {
+  const showOwlMessage = useCallback((messageData: Omit<OwlMessage, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
     const newMessage: OwlMessage = {
       id,
@@ -46,21 +46,27 @@ export const OwlGuideProvider: React.FC<OwlGuideProviderProps> = ({ children }) 
     // Auto-remove if autoClose is enabled
     if (newMessage.autoClose) {
       setTimeout(() => {
-        hideOwlMessage(id);
+        setMessages(prev => prev.filter(msg => msg.id !== id));
       }, newMessage.delay);
     }
-  };
+  }, []);
 
-  const hideOwlMessage = (id: string) => {
+  const hideOwlMessage = useCallback((id: string) => {
     setMessages(prev => prev.filter(msg => msg.id !== id));
-  };
+  }, []);
 
-  const hideAllMessages = () => {
+  const hideAllMessages = useCallback(() => {
     setMessages([]);
-  };
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    showOwlMessage,
+    hideOwlMessage,
+    hideAllMessages
+  }), [showOwlMessage, hideOwlMessage, hideAllMessages]);
 
   return (
-    <OwlContext.Provider value={{ showOwlMessage, hideOwlMessage, hideAllMessages }}>
+    <OwlContext.Provider value={contextValue}>
       {children}
       {messages.map(message => (
         <OwlGuide

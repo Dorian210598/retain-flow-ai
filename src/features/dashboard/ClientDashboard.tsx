@@ -87,7 +87,7 @@ export const ClientDashboard = () => {
     return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
   }
 
-  // Show welcome message only once
+  // Show welcome message only once - with proper dependency array
   useEffect(() => {
     if (!loading && policy) {
       const timer = setTimeout(() => {
@@ -101,7 +101,7 @@ export const ClientDashboard = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [loading, policy, showOwlMessage]);
+  }, [loading, policy]); // Removed showOwlMessage from dependencies
 
   if (loading) {
     return (

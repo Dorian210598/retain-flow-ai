@@ -53,7 +53,7 @@ const ResearchIntro = () => {
     }
   ];
 
-  // Show only one welcome message
+  // Show only one welcome message - with proper dependency array
   useEffect(() => {
     if (currentSlide === 0) {
       const timer = setTimeout(() => {
@@ -67,7 +67,7 @@ const ResearchIntro = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentSlide, showOwlMessage]);
+  }, [currentSlide]); // Removed showOwlMessage from dependencies
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
