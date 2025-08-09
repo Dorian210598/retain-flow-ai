@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { X, MessageCircle } from 'lucide-react';
 
@@ -20,28 +20,23 @@ export const OwlGuide: React.FC<OwlGuideProps> = ({
   delay = 5000
 }) => {
   const [isVisible, setIsVisible] = useState(visible);
-  const [isAnimating, setIsAnimating] = useState(false);
 
-  React.useEffect(() => {
-    if (visible) {
-      setIsVisible(true);
-      setIsAnimating(true);
-      
-      if (autoClose) {
-        const timer = setTimeout(() => {
-          handleClose();
-        }, delay);
-        return () => clearTimeout(timer);
-      }
+  useEffect(() => {
+    setIsVisible(visible);
+  }, [visible]);
+
+  useEffect(() => {
+    if (isVisible && autoClose) {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, delay);
+      return () => clearTimeout(timer);
     }
-  }, [visible, autoClose, delay]);
+  }, [isVisible, autoClose, delay]);
 
   const handleClose = () => {
-    setIsAnimating(false);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose?.();
-    }, 300);
+    setIsVisible(false);
+    onClose?.();
   };
 
   const getPositionClasses = () => {
@@ -64,9 +59,9 @@ export const OwlGuide: React.FC<OwlGuideProps> = ({
   return (
     <div 
       className={cn(
-        "fixed z-50 max-w-sm",
+        "fixed z-50 max-w-sm transition-all duration-500",
         getPositionClasses(),
-        isAnimating ? "animate-fade-in animate-scale-in" : "animate-fade-out animate-scale-out"
+        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
       )}
     >
       {/* Speech bubble */}
@@ -89,18 +84,15 @@ export const OwlGuide: React.FC<OwlGuideProps> = ({
 
       {/* Animated Owl */}
       <div className="flex justify-start pl-4">
-        <div className="relative">
+        <div className="relative animate-bounce">
           {/* Owl body */}
-          <div className={cn(
-            "w-16 h-20 bg-gradient-to-b from-amber-100 to-amber-200 rounded-full relative transition-transform duration-1000",
-            isAnimating && "animate-pulse"
-          )}>
+          <div className="w-16 h-20 bg-gradient-to-b from-amber-100 to-amber-200 rounded-full relative">
             {/* Owl face */}
             <div className="absolute inset-x-0 top-2 flex justify-center">
               <div className="w-12 h-12 bg-white rounded-full border-2 border-amber-300 relative">
                 {/* Eyes */}
-                <div className="absolute top-2 left-2 w-3 h-3 bg-black rounded-full animate-pulse"></div>
-                <div className="absolute top-2 right-2 w-3 h-3 bg-black rounded-full animate-pulse"></div>
+                <div className="absolute top-2 left-2 w-3 h-3 bg-black rounded-full"></div>
+                <div className="absolute top-2 right-2 w-3 h-3 bg-black rounded-full"></div>
                 
                 {/* Beak */}
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-3 border-transparent border-t-orange-400"></div>
@@ -108,22 +100,13 @@ export const OwlGuide: React.FC<OwlGuideProps> = ({
             </div>
 
             {/* Wings */}
-            <div className={cn(
-              "absolute top-8 -left-1 w-4 h-8 bg-amber-200 rounded-full transform transition-transform duration-700",
-              isAnimating && "-rotate-12"
-            )}></div>
-            <div className={cn(
-              "absolute top-8 -right-1 w-4 h-8 bg-amber-200 rounded-full transform transition-transform duration-700",
-              isAnimating && "rotate-12"
-            )}></div>
+            <div className="absolute top-8 -left-1 w-4 h-8 bg-amber-200 rounded-full"></div>
+            <div className="absolute top-8 -right-1 w-4 h-8 bg-amber-200 rounded-full"></div>
 
             {/* Feet */}
             <div className="absolute -bottom-1 left-3 w-2 h-3 bg-orange-400 rounded-sm"></div>
             <div className="absolute -bottom-1 right-3 w-2 h-3 bg-orange-400 rounded-sm"></div>
           </div>
-
-          {/* Floating animation */}
-          <div className="absolute inset-0 animate-[bounce_2s_infinite]"></div>
         </div>
       </div>
     </div>
