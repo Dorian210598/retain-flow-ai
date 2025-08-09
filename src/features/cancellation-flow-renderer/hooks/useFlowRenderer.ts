@@ -117,7 +117,11 @@ export const useFlowRenderer = (policyId?: string) => {
   };
 
   const trackEvent = async (eventType: string, eventData: any = {}) => {
-    if (!sessionId || !flowVariant) return;
+    console.log('🔴 trackEvent called with sessionId:', sessionId);
+    if (!sessionId || !flowVariant) {
+      console.log('🔴 trackEvent skipped - no sessionId or flowVariant');
+      return;
+    }
 
     const currentStep = flowVariant.flow_steps[currentStepIndex];
     if (!currentStep) return;
@@ -131,6 +135,7 @@ export const useFlowRenderer = (policyId?: string) => {
           event_type: eventType,
           event_data: eventData
         });
+      console.log('🔴 trackEvent success for sessionId:', sessionId);
     } catch (error) {
       console.error('Error tracking event:', error);
     }

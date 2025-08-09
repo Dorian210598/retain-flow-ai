@@ -41,7 +41,7 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId, onBackToDa
   });
   
   useSessionRecorder({
-    sessionId: sessionId || '',
+    sessionId: sessionId || '', 
     stepId: currentStep?.id || '',
     throttleMs: 100
   });
