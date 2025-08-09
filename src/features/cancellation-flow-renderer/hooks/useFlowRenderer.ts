@@ -91,7 +91,7 @@ export const useFlowRenderer = (policyId?: string) => {
         throw sessionError;
       }
       
-      console.log('✅ Session created successfully:', session);
+      console.log('🔥 NEW CODE: Session created successfully:', session);
       console.log('📝 About to set sessionId to:', session.id);
       
       // Force state update with callback to ensure it's set
