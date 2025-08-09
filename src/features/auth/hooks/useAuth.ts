@@ -19,36 +19,49 @@ export const useAuth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener first
+    // Set up auth state listener first - NEVER use async function directly
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          console.log('Fetching profile for user:', session.user.id);
-          const { data: profileData, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-          
-          if (error) {
-            console.error('Error fetching profile:', error);
-            setProfile(null);
-          } else {
-            console.log('Profile loaded:', profileData);
-            setProfile(profileData);
-          }
+          // Defer profile fetch with setTimeout to prevent deadlock
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
+
+    // Function to fetch user profile
+    const fetchUserProfile = async (userId: string) => {
+      try {
+        console.log('Fetching profile for user:', userId);
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching profile:', error);
+          setProfile(null);
+        } else {
+          console.log('Profile loaded:', profileData);
+          setProfile(profileData);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserProfile:', error);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     // Check for existing session
     console.log('Checking for existing session...');
