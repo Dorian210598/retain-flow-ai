@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useOwlGuide } from '@/components/OwlGuideProvider';
 import { Shield, Calendar, AlertTriangle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { FlowRenderer } from '@/features/cancellation-flow-renderer/components/FlowRenderer';
@@ -24,6 +25,7 @@ interface ClientPolicy {
 
 export const ClientDashboard = () => {
   const { profile, signOut } = useAuth();
+  const { showOwlMessage } = useOwlGuide();
   const [policy, setPolicy] = useState<ClientPolicy | null>(null);
   const [showCancellation, setShowCancellation] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -73,7 +75,13 @@ export const ClientDashboard = () => {
 
   const handleStartCancellation = () => {
     if (policy) {
-      setShowCancellation(true);
+      showOwlMessage({
+        message: "Teraz rozpoczyna się właściwe badanie! Przejdziesz przez proces anulowania polisy. Każdy krok może zawierać różne strategie retencji - obserwuj je uważnie i reaguj naturalnie! 🔍",
+        position: 'center',
+        autoClose: true,
+        delay: 6000
+      });
+      setTimeout(() => setShowCancellation(true), 2000);
     }
   };
 
@@ -84,6 +92,22 @@ export const ClientDashboard = () => {
   if (showCancellation && policy) {
     return <FlowRenderer policyId={policy.id} onBackToDashboard={handleBackToDashboard} />;
   }
+
+  // Show welcome owl message
+  useEffect(() => {
+    if (!loading && policy) {
+      const timer = setTimeout(() => {
+        showOwlMessage({
+          message: "Świetnie! Jesteście teraz w panelu klienta. Zobaczycie tutaj symulowaną polisę ubezpieczeniową. Gdy będziecie gotowi, kliknijcie 'Start Cancellation Process', aby rozpocząć badanie! 📋",
+          position: 'bottom-left',
+          autoClose: true,
+          delay: 8000
+        });
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, policy, showOwlMessage]);
 
   if (loading) {
     return (

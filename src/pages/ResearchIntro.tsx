@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useOwlGuide } from '@/components/OwlGuideProvider';
 import { GraduationCap, Users, Target, Shield, BookOpen, ArrowRight, HelpCircle } from 'lucide-react';
 
 const ResearchIntro = () => {
   const navigate = useNavigate();
+  const { showOwlMessage } = useOwlGuide();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
@@ -51,11 +53,40 @@ const ResearchIntro = () => {
     }
   ];
 
+  // Show owl messages based on current slide
+  useEffect(() => {
+    const owlMessages = [
+      "Cześć! Jestem Profesor Sowa i będę Waszym przewodnikiem w tym badaniu! 🦉 Kliknijcie na podkreślone słowa, żeby dowiedzieć się więcej!",
+      "Teraz opowiem Wam o celu tego badania. To fascynujące, jak różne strategie mogą wpłynąć na decyzje klientów!",
+      "Wasza rola jest bardzo ważna! Będziecie symulować prawdziwego klienta - reagujcie naturalnie na to, co zobaczycie.",
+      "Pamiętajcie - wszystko jest całkowicie bezpieczne! To tylko symulacja dla celów naukowych. Możecie spokojnie eksperymentować!"
+    ];
+
+    if (currentSlide < owlMessages.length) {
+      const timer = setTimeout(() => {
+        showOwlMessage({
+          message: owlMessages[currentSlide],
+          position: currentSlide % 2 === 0 ? 'bottom-right' : 'bottom-left',
+          autoClose: true,
+          delay: 8000
+        });
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentSlide, showOwlMessage]);
+
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     } else {
-      navigate('/auth');
+      showOwlMessage({
+        message: "Świetnie! Teraz przejdziemy do logowania. Pamiętajcie - większość z Was powinna wybrać rolę 'Client'. Powodzenia! 🎓",
+        position: 'center',
+        autoClose: true,
+        delay: 5000
+      });
+      setTimeout(() => navigate('/auth'), 1000);
     }
   };
 
