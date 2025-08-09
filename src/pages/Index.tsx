@@ -1,13 +1,15 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { AdminDashboard } from '@/features/dashboard/AdminDashboard';
+import { ClientDashboard } from '@/features/dashboard/ClientDashboard';
 
 const Index = () => {
+  const { profile } = useAuth();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <ProtectedRoute>
+      {profile?.role === 'admin' ? <AdminDashboard /> : <ClientDashboard />}
+    </ProtectedRoute>
   );
 };
 
