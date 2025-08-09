@@ -15,7 +15,10 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId }) => {
     totalSteps,
     handleNext,
     handleAccept,
-    handleDecline
+    handleDecline,
+    isCompleted,
+    completionData,
+    handleResetFlow
   } = useFlowRenderer(policyId);
 
   if (loading) {
@@ -26,6 +29,27 @@ export const FlowRenderer: React.FC<FlowRendererProps> = ({ policyId }) => {
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-12 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  // Show completion summary if flow is completed
+  if (isCompleted && completionData) {
+    const CompletionSummary = componentMap['CompletionSummary'];
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="bg-card border-b">
+          <div className="container mx-auto px-4 py-4">
+            <h1 className="text-lg font-semibold">Process Complete</h1>
+          </div>
+        </div>
+        <main className="container mx-auto px-4 py-8">
+          <CompletionSummary
+            outcome={completionData.outcome}
+            discountData={completionData.discountData}
+            onClose={handleResetFlow}
+          />
+        </main>
       </div>
     );
   }

@@ -21,6 +21,11 @@ export const useFlowRenderer = (policyId?: string) => {
   const [flowVariant, setFlowVariant] = useState<FlowVariant | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [completionData, setCompletionData] = useState<{
+    outcome: 'retained' | 'cancelled';
+    discountData?: any;
+  } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -130,7 +135,7 @@ export const useFlowRenderer = (policyId?: string) => {
 
   const handleAccept = async (data?: any) => {
     await trackEvent('offer_accepted', data);
-    await completeSession('retained');
+    await completeSession('retained', data);
   };
 
   const handleDecline = async (data?: any) => {
@@ -138,7 +143,7 @@ export const useFlowRenderer = (policyId?: string) => {
     await handleNext(data);
   };
 
-  const completeSession = async (outcome: 'retained' | 'cancelled') => {
+  const completeSession = async (outcome: 'retained' | 'cancelled', data?: any) => {
     if (!sessionId) return;
 
     try {
@@ -150,16 +155,27 @@ export const useFlowRenderer = (policyId?: string) => {
         })
         .eq('id', sessionId);
 
-      toast({
-        title: outcome === 'retained' ? "Thank you!" : "Policy Cancelled",
-        description: outcome === 'retained' 
-          ? "We're glad you decided to stay with us."
-          : "Your policy has been cancelled successfully."
+      // Set completion state instead of just showing toast
+      setCompletionData({
+        outcome,
+        discountData: data
       });
+      setIsCompleted(true);
 
     } catch (error) {
       console.error('Error completing session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete the process. Please try again.",
+        variant: "destructive"
+      });
     }
+  };
+
+  const handleResetFlow = () => {
+    setIsCompleted(false);
+    setCompletionData(null);
+    setCurrentStepIndex(0);
   };
 
   const currentStep = flowVariant?.flow_steps[currentStepIndex];
@@ -172,6 +188,9 @@ export const useFlowRenderer = (policyId?: string) => {
     totalSteps: flowVariant?.flow_steps.length ?? 0,
     handleNext,
     handleAccept,
-    handleDecline
+    handleDecline,
+    isCompleted,
+    completionData,
+    handleResetFlow
   };
 };

@@ -36,7 +36,10 @@ export const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Design dynamic retention strategies with drag-and-drop components
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => alert('Flow Builder feature coming soon!')}
+              >
                 Build Flows
               </Button>
             </CardContent>
@@ -56,7 +59,10 @@ export const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Track retention rates, conversion funnels, and A/B test results
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => alert('Analytics feature coming soon!')}
+              >
                 View Analytics
               </Button>
             </CardContent>
@@ -76,7 +82,10 @@ export const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 View and manage client insurance policies and cancellation sessions
               </p>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => alert('Client Management feature coming soon!')}
+              >
                 Manage Clients
               </Button>
             </CardContent>
