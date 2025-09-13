@@ -277,7 +277,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
   const openFlowEditor = (flow: Flow) => {
     setSelectedFlow(flow);
     
-    // Convert flow steps to nodes and edges
+    // Convert flow steps to nodes and edges (simplified display)
     const variant = flow.flow_variants[0];
     if (variant && variant.flow_steps) {
       const flowNodes: Node[] = variant.flow_steps
@@ -288,31 +288,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
           position: { x: 200, y: index * 150 + 50 },
           data: {
             label: (
-              <div className="text-center">
+              <div className="text-center p-2">
                 <div className="font-semibold">{step.component_name}</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Step {step.step_order}
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setEditingStep(step)}
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Delete button clicked for step (initial):', step.id, step.component_name);
-                      deleteStep(step.id);
-                    }}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
             )
@@ -358,38 +337,17 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
 
       if (error) throw error;
 
-      // Add new node to existing nodes immediately
+      // Add new node to existing nodes immediately (simplified display)
       const newNode: Node = {
         id: data.id,
         type: 'default',
-        position: { x: 200, y: (maxOrder) * 150 + 200 }, // Position below existing nodes
+        position: { x: 200, y: (maxOrder) * 150 + 200 },
         data: {
           label: (
-            <div className="text-center">
+            <div className="text-center p-2">
               <div className="font-semibold">{data.component_name}</div>
               <div className="text-xs text-muted-foreground mt-1">
                 Step {data.step_order}
-              </div>
-              <div className="flex gap-2 mt-2">
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => setEditingStep(data)}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Delete button clicked for step:', data.id, data.component_name);
-                      deleteStep(data.id);
-                    }}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
               </div>
             </div>
           )
@@ -575,47 +533,21 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       // Update selectedFlow with reordered steps
       setSelectedFlow(updatedFlow);
 
-      // Rebuild nodes and edges with updated step orders
+      // Rebuild nodes and edges with updated step orders (simplified for display only)
       const updatedVariant = updatedFlow.flow_variants[0];
       if (updatedVariant && updatedVariant.flow_steps) {
         const flowNodes: Node[] = updatedVariant.flow_steps
           .sort((a, b) => a.step_order - b.step_order)
           .map((step, index) => ({
-            id: `node-${step.id}-${Date.now()}-${index}`, // Force new node IDs to prevent caching issues
+            id: `node-${step.id}-${Date.now()}-${index}`,
             type: 'default',
             position: { x: 200, y: index * 150 + 50 },
             data: {
               label: (
-                <div className="text-center">
+                <div className="text-center p-2">
                   <div className="font-semibold">{step.component_name}</div>
                   <div className="text-xs text-muted-foreground mt-1">
                     Step {step.step_order}
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Edit button clicked for step:', step.id, step.component_name);
-                        setEditingStep(step);
-                      }}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Delete button clicked for step:', step.id, step.component_name);
-                        deleteStep(step.id);
-                      }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
                   </div>
                 </div>
               )
@@ -625,14 +557,13 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         const flowEdges: Edge[] = flowNodes
           .slice(0, -1)
           .map((node, index) => ({
-            id: `edge-${index}-${Date.now()}`, // Force new edge IDs
+            id: `edge-${index}-${Date.now()}`,
             source: node.id,
             target: flowNodes[index + 1].id,
             type: 'smoothstep',
             animated: true
           }));
 
-        console.log('Setting new nodes:', flowNodes.map(n => ({ id: n.id, data: n.data })));
         setNodes(flowNodes);
         setEdges(flowEdges);
       }
@@ -714,6 +645,47 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
             <Controls />
             <Background />
           </ReactFlow>
+        </div>
+
+        {/* Steps Management Panel */}
+        <div className="border-t bg-card p-4">
+          <h3 className="font-semibold mb-4">Flow Steps</h3>
+          <div className="space-y-2">
+            {selectedFlow.flow_variants[0]?.flow_steps
+              ?.sort((a, b) => a.step_order - b.step_order)
+              .map((step) => (
+                <div key={step.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+                      {step.step_order}
+                    </span>
+                    <div>
+                      <div className="font-medium">{step.component_name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {componentTypes.find(c => c.value === step.component_name)?.description}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setEditingStep(step)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => deleteStep(step.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
         </div>
 
         {/* Step Configuration Dialog */}
