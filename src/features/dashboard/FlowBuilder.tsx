@@ -581,7 +581,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         const flowNodes: Node[] = updatedVariant.flow_steps
           .sort((a, b) => a.step_order - b.step_order)
           .map((step, index) => ({
-            id: step.id,
+            id: `node-${step.id}-${Date.now()}-${index}`, // Force new node IDs to prevent caching issues
             type: 'default',
             position: { x: 200, y: index * 150 + 50 },
             data: {
@@ -595,7 +595,12 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => setEditingStep(step)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Edit button clicked for step:', step.id, step.component_name);
+                        setEditingStep(step);
+                      }}
                     >
                       <Edit className="h-3 w-3" />
                     </Button>
@@ -620,13 +625,14 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         const flowEdges: Edge[] = flowNodes
           .slice(0, -1)
           .map((node, index) => ({
-            id: `e${index}`,
+            id: `edge-${index}-${Date.now()}`, // Force new edge IDs
             source: node.id,
             target: flowNodes[index + 1].id,
             type: 'smoothstep',
             animated: true
           }));
 
+        console.log('Setting new nodes:', flowNodes.map(n => ({ id: n.id, data: n.data })));
         setNodes(flowNodes);
         setEdges(flowEdges);
       }
