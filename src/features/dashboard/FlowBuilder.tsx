@@ -507,6 +507,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       if (!stepToDelete) return;
 
       const deletedOrder = stepToDelete.step_order;
+      console.log('Deleting step:', stepToDelete.component_name, 'with order:', deletedOrder);
 
       // Delete the step
       const { error: deleteError } = await supabase
@@ -516,23 +517,28 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
 
       if (deleteError) throw deleteError;
 
-      // Get all steps that need to be reordered (those with higher step_order)
+      // Get all steps that need to be reordered (exclude the deleted step)
       const stepsToReorder = variant.flow_steps
-        .filter(step => step.step_order > deletedOrder)
+        .filter(step => step.id !== stepId && step.step_order > deletedOrder)
         .map(step => ({ 
           id: step.id, 
-          newOrder: step.step_order - 1 
+          currentOrder: step.step_order,
+          newOrder: step.step_order - 1,
+          component_name: step.component_name
         }));
+
+      console.log('Steps to reorder:', stepsToReorder);
 
       // Update step_order for each step individually
       for (const step of stepsToReorder) {
+        console.log(`Updating ${step.component_name} from order ${step.currentOrder} to ${step.newOrder}`);
         const { error: updateError } = await supabase
           .from('flow_steps')
           .update({ step_order: step.newOrder })
           .eq('id', step.id);
 
         if (updateError) {
-          console.warn('Failed to update step order:', updateError);
+          console.error('Failed to update step order for', step.component_name, ':', updateError);
         }
       }
 
@@ -550,6 +556,11 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         .single();
 
       if (reloadError) throw reloadError;
+
+      console.log('Updated flow steps:', updatedFlow.flow_variants[0].flow_steps.map(s => ({
+        name: s.component_name,
+        order: s.step_order
+      })));
 
       // Update selectedFlow with reordered steps
       setSelectedFlow(updatedFlow);
@@ -611,6 +622,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       });
 
     } catch (error: any) {
+      console.error('Delete step error:', error);
       toast({
         title: "Error",
         description: "Failed to delete step: " + error.message,
