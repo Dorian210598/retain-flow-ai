@@ -162,6 +162,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
 
   const loadFlows = async () => {
     try {
+      console.log('📋 Loading flows from database...');
       const { data, error } = await supabase
         .from('cancellation_flows')
         .select(`
@@ -174,8 +175,16 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      console.log('📋 Loaded flows:', data?.map(flow => ({
+        id: flow.id,
+        name: flow.name,
+        steps: flow.flow_variants[0]?.flow_steps?.length || 0
+      })));
+      
       setFlows(data || []);
     } catch (error: any) {
+      console.error('❌ Failed to load flows:', error);
       toast({
         title: "Error",
         description: "Failed to load flows: " + error.message,
@@ -275,6 +284,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
   };
 
   const openFlowEditor = (flow: Flow) => {
+    console.log('🎯 Opening flow editor for:', flow.name, 'with steps:', flow.flow_variants[0]?.flow_steps?.length);
     setSelectedFlow(flow);
     
     // Convert flow steps to nodes and edges (simplified display)
@@ -475,15 +485,21 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       if (!stepToDelete) return;
 
       const deletedOrder = stepToDelete.step_order;
-      console.log('Deleting step:', stepToDelete.component_name, 'with order:', deletedOrder);
+      console.log('🗑️ Starting deletion process for step:', stepToDelete.component_name, 'with order:', deletedOrder);
 
       // Delete the step
+      console.log('🗑️ Attempting to delete step from database...');
       const { error: deleteError } = await supabase
         .from('flow_steps')
         .delete()
         .eq('id', stepId);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('❌ Delete error:', deleteError);
+        throw deleteError;
+      }
+      
+      console.log('✅ Step deleted from database successfully');
 
       // Get all steps that need to be reordered (exclude the deleted step)
       const stepsToReorder = variant.flow_steps
@@ -495,22 +511,25 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
           component_name: step.component_name
         }));
 
-      console.log('Steps to reorder:', stepsToReorder);
+      console.log('🔄 Steps to reorder:', stepsToReorder);
 
       // Update step_order for each step individually
       for (const step of stepsToReorder) {
-        console.log(`Updating ${step.component_name} from order ${step.currentOrder} to ${step.newOrder}`);
+        console.log(`🔄 Updating ${step.component_name} from order ${step.currentOrder} to ${step.newOrder}`);
         const { error: updateError } = await supabase
           .from('flow_steps')
           .update({ step_order: step.newOrder })
           .eq('id', step.id);
 
         if (updateError) {
-          console.error('Failed to update step order for', step.component_name, ':', updateError);
+          console.error('❌ Failed to update step order for', step.component_name, ':', updateError);
+        } else {
+          console.log('✅ Updated step order successfully');
         }
       }
 
       // Reload the flow to get updated step orders
+      console.log('🔄 Reloading flow data from database...');
       const { data: updatedFlow, error: reloadError } = await supabase
         .from('cancellation_flows')
         .select(`
@@ -523,9 +542,13 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
         .eq('id', selectedFlow.id)
         .single();
 
-      if (reloadError) throw reloadError;
+      if (reloadError) {
+        console.error('❌ Reload error:', reloadError);
+        throw reloadError;
+      }
 
-      console.log('Updated flow steps:', updatedFlow.flow_variants[0].flow_steps.map(s => ({
+      console.log('📊 Updated flow steps after deletion:', updatedFlow.flow_variants[0].flow_steps.map(s => ({
+        id: s.id,
         name: s.component_name,
         order: s.step_order
       })));
@@ -574,7 +597,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       });
 
     } catch (error: any) {
-      console.error('Delete step error:', error);
+      console.error('💥 Delete step error:', error);
       toast({
         title: "Error",
         description: "Failed to delete step: " + error.message,
@@ -599,7 +622,11 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
           <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" onClick={() => setView('list')}>
+                <Button variant="outline" size="sm" onClick={() => {
+                  console.log('🔙 Returning to flow list');
+                  setView('list');
+                  loadFlows(); // Refresh the flows when going back
+                }}>
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
