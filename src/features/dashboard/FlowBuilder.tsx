@@ -304,7 +304,12 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    onClick={() => deleteStep(step.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Delete button clicked for step (initial):', step.id, step.component_name);
+                      deleteStep(step.id);
+                    }}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -373,13 +378,18 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                 >
                   <Edit className="h-3 w-3" />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => deleteStep(data.id)}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Delete button clicked for step:', data.id, data.component_name);
+                      deleteStep(data.id);
+                    }}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
               </div>
             </div>
           )
@@ -592,7 +602,12 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => deleteStep(step.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Delete button clicked for step:', step.id, step.component_name);
+                        deleteStep(step.id);
+                      }}
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
