@@ -293,14 +293,22 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                 <div className="text-xs text-muted-foreground mt-1">
                   Step {step.step_order}
                 </div>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="mt-2"
-                  onClick={() => setEditingStep(step)}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
+                <div className="flex gap-2 mt-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => setEditingStep(step)}
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => deleteStep(step.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             )
           }
@@ -357,14 +365,22 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
               <div className="text-xs text-muted-foreground mt-1">
                 Step {data.step_order}
               </div>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="mt-2"
-                onClick={() => setEditingStep(data)}
-              >
-                <Edit className="h-3 w-3" />
-              </Button>
+              <div className="flex gap-2 mt-2">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setEditingStep(data)}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => deleteStep(data.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           )
         }
@@ -439,14 +455,22 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
                     <div className="text-xs text-muted-foreground mt-1">
                       Step {stepData?.step_order}
                     </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="mt-2"
-                      onClick={() => setEditingStep(stepData)}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
+                    <div className="flex gap-2 mt-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => setEditingStep(stepData)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => deleteStep(stepId)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 )
               }
@@ -466,6 +490,75 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
       toast({
         title: "Error",
         description: "Failed to update step: " + error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteStep = async (stepId: string) => {
+    if (!selectedFlow) return;
+
+    try {
+      const { error } = await supabase
+        .from('flow_steps')
+        .delete()
+        .eq('id', stepId);
+
+      if (error) throw error;
+
+      // Remove node and update edges
+      setNodes(prevNodes => {
+        const nodeIndex = prevNodes.findIndex(node => node.id === stepId);
+        const updatedNodes = prevNodes.filter(node => node.id !== stepId);
+        
+        // Update edges to maintain connections
+        setEdges(prevEdges => {
+          // Remove edges connected to the deleted node
+          let updatedEdges = prevEdges.filter(edge => 
+            edge.source !== stepId && edge.target !== stepId
+          );
+          
+          // If deleted node was in the middle, connect previous to next
+          if (nodeIndex > 0 && nodeIndex < prevNodes.length - 1) {
+            const prevNodeId = prevNodes[nodeIndex - 1].id;
+            const nextNodeId = prevNodes[nodeIndex + 1].id;
+            
+            updatedEdges.push({
+              id: `e${nodeIndex - 1}-reconnect`,
+              source: prevNodeId,
+              target: nextNodeId,
+              type: 'smoothstep',
+              animated: true
+            });
+          }
+          
+          return updatedEdges;
+        });
+        
+        return updatedNodes;
+      });
+
+      // Update selectedFlow state
+      setSelectedFlow(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          flow_variants: [{
+            ...prev.flow_variants[0],
+            flow_steps: prev.flow_variants[0].flow_steps.filter(step => step.id !== stepId)
+          }]
+        };
+      });
+
+      toast({
+        title: "Success",
+        description: "Step deleted successfully"
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to delete step: " + error.message,
         variant: "destructive"
       });
     }
