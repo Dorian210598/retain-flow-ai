@@ -498,61 +498,116 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ onBack }) => {
   const deleteStep = async (stepId: string) => {
     if (!selectedFlow) return;
 
+    const variant = selectedFlow.flow_variants[0];
+    if (!variant) return;
+
     try {
-      const { error } = await supabase
+      // Find the step being deleted to get its order
+      const stepToDelete = variant.flow_steps.find(step => step.id === stepId);
+      if (!stepToDelete) return;
+
+      const deletedOrder = stepToDelete.step_order;
+
+      // Delete the step
+      const { error: deleteError } = await supabase
         .from('flow_steps')
         .delete()
         .eq('id', stepId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
-      // Remove node and update edges
-      setNodes(prevNodes => {
-        const nodeIndex = prevNodes.findIndex(node => node.id === stepId);
-        const updatedNodes = prevNodes.filter(node => node.id !== stepId);
-        
-        // Update edges to maintain connections
-        setEdges(prevEdges => {
-          // Remove edges connected to the deleted node
-          let updatedEdges = prevEdges.filter(edge => 
-            edge.source !== stepId && edge.target !== stepId
-          );
-          
-          // If deleted node was in the middle, connect previous to next
-          if (nodeIndex > 0 && nodeIndex < prevNodes.length - 1) {
-            const prevNodeId = prevNodes[nodeIndex - 1].id;
-            const nextNodeId = prevNodes[nodeIndex + 1].id;
-            
-            updatedEdges.push({
-              id: `e${nodeIndex - 1}-reconnect`,
-              source: prevNodeId,
-              target: nextNodeId,
-              type: 'smoothstep',
-              animated: true
-            });
-          }
-          
-          return updatedEdges;
-        });
-        
-        return updatedNodes;
-      });
+      // Get all steps that need to be reordered (those with higher step_order)
+      const stepsToReorder = variant.flow_steps
+        .filter(step => step.step_order > deletedOrder)
+        .map(step => ({ 
+          id: step.id, 
+          newOrder: step.step_order - 1 
+        }));
 
-      // Update selectedFlow state
-      setSelectedFlow(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          flow_variants: [{
-            ...prev.flow_variants[0],
-            flow_steps: prev.flow_variants[0].flow_steps.filter(step => step.id !== stepId)
-          }]
-        };
-      });
+      // Update step_order for each step individually
+      for (const step of stepsToReorder) {
+        const { error: updateError } = await supabase
+          .from('flow_steps')
+          .update({ step_order: step.newOrder })
+          .eq('id', step.id);
+
+        if (updateError) {
+          console.warn('Failed to update step order:', updateError);
+        }
+      }
+
+      // Reload the flow to get updated step orders
+      const { data: updatedFlow, error: reloadError } = await supabase
+        .from('cancellation_flows')
+        .select(`
+          *,
+          flow_variants (
+            *,
+            flow_steps (*)
+          )
+        `)
+        .eq('id', selectedFlow.id)
+        .single();
+
+      if (reloadError) throw reloadError;
+
+      // Update selectedFlow with reordered steps
+      setSelectedFlow(updatedFlow);
+
+      // Rebuild nodes and edges with updated step orders
+      const updatedVariant = updatedFlow.flow_variants[0];
+      if (updatedVariant && updatedVariant.flow_steps) {
+        const flowNodes: Node[] = updatedVariant.flow_steps
+          .sort((a, b) => a.step_order - b.step_order)
+          .map((step, index) => ({
+            id: step.id,
+            type: 'default',
+            position: { x: 200, y: index * 150 + 50 },
+            data: {
+              label: (
+                <div className="text-center">
+                  <div className="font-semibold">{step.component_name}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Step {step.step_order}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setEditingStep(step)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => deleteStep(step.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )
+            }
+          }));
+
+        const flowEdges: Edge[] = flowNodes
+          .slice(0, -1)
+          .map((node, index) => ({
+            id: `e${index}`,
+            source: node.id,
+            target: flowNodes[index + 1].id,
+            type: 'smoothstep',
+            animated: true
+          }));
+
+        setNodes(flowNodes);
+        setEdges(flowEdges);
+      }
 
       toast({
         title: "Success",
-        description: "Step deleted successfully"
+        description: "Step deleted and remaining steps reordered successfully"
       });
 
     } catch (error: any) {
