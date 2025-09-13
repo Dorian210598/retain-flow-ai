@@ -59,6 +59,7 @@ const componentTypes = [
   { value: 'ServiceUpgrade', label: 'Service Upgrade', description: 'Offer premium plans' },
   { value: 'PauseSubscription', label: 'Pause Subscription', description: 'Temporary suspension option' },
   { value: 'LoyaltyReward', label: 'Loyalty Reward', description: 'Special offers for loyal customers' },
+  { value: 'CompletionSummary', label: 'Completion Summary', description: 'Show process completion' },
   { value: 'FinalConfirmation', label: 'Final Confirmation', description: 'Confirm cancellation' }
 ];
 
@@ -127,6 +128,11 @@ const defaultConfigs = {
         value: "50% OFF"
       }
     ]
+  },
+  CompletionSummary: {
+    title: "Process Complete",
+    description: "Thank you for your time",
+    showRetentionResults: true
   },
   FinalConfirmation: {
     title: "Are you sure?",
