@@ -391,14 +391,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_my_organization_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_my_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_my_organization_id: { Args: never; Returns: string }
+      get_my_role: { Args: never; Returns: string }
       get_session_replay_data: {
         Args: { session_uuid: string }
         Returns: {
